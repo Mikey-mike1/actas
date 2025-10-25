@@ -5,6 +5,11 @@ use App\Http\Controllers\ActaController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+// PONER / EN LA RAÍZ
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
 // RUTAS DE AUTENTICACIÓN
 Route::get('/login', [AuthController::class, 'loginView'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
