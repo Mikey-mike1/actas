@@ -52,7 +52,15 @@ Route::get('/actas/ultima-actualizacion', function () {
     return response()->json(['ultima_actualizacion' => $ultima]);
 });
 
-Route::get('/test-s3', function() {
-    Storage::disk('s3')->put('test.txt', 'Conexión exitosa a S3');
-    return 'Archivo subido a S3';
+Route::get('/test-s3-upload', function() {
+    try {
+        $filePath = Storage::disk('s3')->put('test', '¡Conexión exitosa!');
+        if ($filePath) {
+            return '✅ Archivo subido a S3 en: ' . Storage::disk('s3')->url($filePath);
+        } else {
+            return '❌ No se pudo subir el archivo.';
+        }
+    } catch (\Exception $e) {
+        return '❌ Error: ' . $e->getMessage();
+    }
 });
