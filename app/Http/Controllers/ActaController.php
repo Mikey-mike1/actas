@@ -147,7 +147,6 @@ class ActaController extends Controller
 
         // Eliminar PDF de S3 si existe
         if ($acta->pdf_path) {
-            // Extraemos la ruta relativa de S3
             $relativePath = parse_url($acta->pdf_path, PHP_URL_PATH);
             Storage::disk('s3')->delete(ltrim($relativePath, '/'));
         }
