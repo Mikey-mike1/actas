@@ -21,7 +21,7 @@ class ActaController extends Controller
         return view('actas.create', compact('municipios', 'candidatos'));
     }
 
-    // Guardar acta en la base de datos
+    // Guardar acta en la base de datos y subir PDF a S3
     public function store(Request $request)
     {
         $request->validate([
@@ -32,10 +32,18 @@ class ActaController extends Controller
             'pdf_path' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
-        // Guardar el archivo PDF en S3 si existe
-        $pdfPath = null;
+        $pdfUrl = null;
+
         if ($request->hasFile('pdf_path')) {
-            $pdfPath = $request->file('pdf_path')->store('actas', 's3');
+            $file = $request->file('pdf_path');
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // Subir archivo a S3 con visibilidad pública
+            $pdfPath = Storage::disk('s3')->putFileAs('actas', $file, $filename, 'public');
+
+            if ($pdfPath) {
+                $pdfUrl = Storage::disk('s3')->url($pdfPath);
+            }
         }
 
         // Crear el acta
@@ -44,7 +52,7 @@ class ActaController extends Controller
             'centro_votacion_id' => $request->centro_votacion_id,
             'jrv' => $request->jrv,
             'observaciones' => $request->observaciones,
-            'pdf_path' => $pdfPath,
+            'pdf_path' => $pdfUrl,
         ]);
 
         // Registrar los resultados por candidato
@@ -139,7 +147,9 @@ class ActaController extends Controller
 
         // Eliminar PDF de S3 si existe
         if ($acta->pdf_path) {
-            Storage::disk('s3')->delete($acta->pdf_path);
+            // Extraemos la ruta relativa de S3
+            $relativePath = parse_url($acta->pdf_path, PHP_URL_PATH);
+            Storage::disk('s3')->delete(ltrim($relativePath, '/'));
         }
 
         // Eliminar resultados relacionados
