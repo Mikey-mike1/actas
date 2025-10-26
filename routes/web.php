@@ -51,3 +51,8 @@ Route::get('/actas/ultima-actualizacion', function () {
     $ultima = \App\Models\Acta::latest('updated_at')->value('updated_at');
     return response()->json(['ultima_actualizacion' => $ultima]);
 });
+
+Route::get('/test-s3', function() {
+    Storage::disk('s3')->put('test.txt', 'Conexión exitosa a S3');
+    return 'Archivo subido a S3';
+});
