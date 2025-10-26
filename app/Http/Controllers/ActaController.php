@@ -32,10 +32,10 @@ class ActaController extends Controller
             'pdf_path' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
-        // Guardar el archivo PDF si existe
+        // Guardar el archivo PDF en S3 si existe
         $pdfPath = null;
         if ($request->hasFile('pdf_path')) {
-            $pdfPath = $request->file('pdf_path')->store('actas', 'public');
+            $pdfPath = $request->file('pdf_path')->store('actas', 's3');
         }
 
         // Crear el acta
@@ -127,7 +127,6 @@ class ActaController extends Controller
         return redirect()->route('actas.listar')->with('success', 'Acta actualizada correctamente.');
     }
 
-
     // Eliminar acta
     public function destroy($id)
     {
@@ -138,9 +137,9 @@ class ActaController extends Controller
             abort(403, 'No tienes permiso para eliminar esta acta.');
         }
 
-        // Eliminar PDF si existe
+        // Eliminar PDF de S3 si existe
         if ($acta->pdf_path) {
-            Storage::disk('public')->delete($acta->pdf_path);
+            Storage::disk('s3')->delete($acta->pdf_path);
         }
 
         // Eliminar resultados relacionados
@@ -151,6 +150,4 @@ class ActaController extends Controller
 
         return redirect()->route('actas.listar')->with('success', '🗑️ Acta eliminada correctamente.');
     }
-
-    
 }
