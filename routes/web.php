@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ActaController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 
 // PONER / EN LA RAÍZ
 Route::get('/', function () {
@@ -52,15 +54,18 @@ Route::get('/actas/ultima-actualizacion', function () {
     return response()->json(['ultima_actualizacion' => $ultima]);
 });
 
-Route::get('/test-s3-upload', function() {
-    try {
-        $filePath = Storage::disk('s3')->put('test', '¡Conexión exitosa!');
-        if ($filePath) {
-            return '✅ Archivo subido a S3 en: ' . Storage::disk('s3')->url($filePath);
-        } else {
-            return '❌ No se pudo subir el archivo.';
-        }
-    } catch (\Exception $e) {
-        return '❌ Error: ' . $e->getMessage();
-    }
+
+Route::middleware(['auth'])->group(function () {
+
+    // 1. Ruta Principal: Muestra TODO (Perfil + Tabla si eres admin)
+    Route::get('/opciones', [ProfileController::class, 'edit'])->name('opciones.edit');
+    
+    // 2. Acción: Cambiar MI propia contraseña
+    Route::patch('/opciones', [ProfileController::class, 'update'])->name('opciones.update');
+
+    // 3. Acciones Administrativas (Editar OTROS / Borrar OTROS)
+    // Estas rutas reciben los datos de los formularios en la tabla
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
 });

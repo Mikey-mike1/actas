@@ -80,7 +80,7 @@
             <li><a href="{{ route('actas.create') }}"><i class="material-icons">edit</i>Registrar Actas</a></li>
             <li><a href="{{ route('actas.listar') }}"><i class="material-icons">visibility</i>Ver Actas</a></li>
             <li><a href="{{ route('estadisticas.index') }}"><i class="material-icons">numbers</i>Estadísticas</a></li>
-            <li><a href="/opciones"><i class="material-icons">settings</i>Opciones</a></li>
+            <li><a href="{{ route('opciones.edit') }}"><i class="material-icons">settings</i>Opciones</a></li>
             @if(auth()->user()->rol === 'admin')
                 <li><a href="{{ route('register') }}"><i class="material-icons">person_add</i>Registrar Usuario</a></li>
             @endif
