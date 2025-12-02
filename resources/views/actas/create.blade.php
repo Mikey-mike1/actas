@@ -10,6 +10,17 @@
         </div>
     @endif
 
+        @if($errors->any())
+        <div class="card-panel red lighten-4 red-text text-darken-4">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+
     <form action="{{ route('actas.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
