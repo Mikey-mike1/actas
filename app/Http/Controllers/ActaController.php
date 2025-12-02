@@ -32,6 +32,13 @@ class ActaController extends Controller
             'pdf_path' => 'nullable|file|mimes:pdf|max:2048',
         ]);
 
+        $Repetido = Acta::where('jrv', $request->jrv)->where('centro_votacion_id', $request->centro_votacion_id)->first();
+
+        if ($Repetido) {
+            return redirect()->back()->withErrors(['jrv' => 'Ya existe un acta con esta JRV.']);
+        }
+
+
         $pdfUrl = null;
 
         if ($request->hasFile('pdf_path')) {
